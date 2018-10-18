@@ -3,17 +3,19 @@ This repository contains all the files to be replaced to implement Immix GC in D
 Follow the steps below to apply these files in Dart VM. 
 
 
+
 Step 1: Cloning Dart VM Repository
 ---
-- Clone this [DartVM repository](https://github.com/dart-lang/sdk).
+- Clone [DartVM repository](https://github.com/dart-lang/sdk).
 - Follow the building steps [here](https://github.com/dart-lang/sdk/wiki/Building). 
+
 
 
 Step 2: Cloning our ImmixInDart 
 ---
 - Go to runtime directory
 ```sh
-$ (...)/sdk/runtime
+$ cd (...)/sdk/runtime
 ```
 
 - Clone our repository
@@ -25,6 +27,8 @@ $ git clone https://github.com/ChangMinPark/ImmixInDart.git
 ```sh
 $ export PATH="$PATH:$PWD"
 ```
+
+
 
 Usage
 ---
