@@ -8,7 +8,12 @@ Step 1: Cloning an Offical Dart SDK Repository
 ---
 - Clone [Official Dart SDK](https://github.com/dart-lang/sdk).
 - Follow the building steps [here](https://github.com/dart-lang/sdk/wiki/Building). 
-
+  - Possible errors
+    - Ninja: error: loading 'build.ninja': No such file or directory.
+    before running **_./tools/build.py_**, run this
+    ```sh
+    $ gclient sync
+    ```
 
 
 Step 2: Cloning our ImmixInDart Repo 
@@ -41,3 +46,19 @@ $ buildDart.sh [Mode]
 
 
 
+Extra
+---
+- [Observatory](https://dart-lang.github.io/observatory/)
+  - Enable
+    ```sh
+    $ dart --enable-vm-service:8181/127.0.0.1 --observe --pause-isolates-on-start <dart script>.dart
+    ```
+  - Dart Observatory does not work on filefox. (I used **_Chromium_**)
+    ```sh
+    apt-get install chromium-browser
+    ```
+  - Open up Chromium, and go to **_https://127.0.0.1:8181_**
+  - Enable an access to host's LocalHost (Link current client's LocalHost to host's LocalHost). Run this on client side.
+    ```sh
+    $ ssh -L 8181:127.0.0.1:8181 <server>
+    ```
