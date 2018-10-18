@@ -32,7 +32,7 @@ $ export PATH="$PATH:$PWD"
 
 Usage
 ---
-- Please work on files under Immix. 
+- Please work on files under **_immix_** directory. Files under **_default_** directory are for reverting to default. 
 - After modification, use build script. (Mode: default or immix)
 ```sh
 $ buildDart.sh [Mode]
