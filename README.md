@@ -9,8 +9,8 @@ Step 1: Cloning an Offical Dart SDK Repository
 - Clone [Official Dart SDK](https://github.com/dart-lang/sdk).
 - Follow the building steps [here](https://github.com/dart-lang/sdk/wiki/Building). 
   - Possible errors
-    - Ninja: error: loading 'build.ninja': No such file or directory.
-    before running **_./tools/build.py_**, run this
+    - **_Ninja Error: loading 'build.ninja': No such file or directory_** -
+    Before running **_./tools/build.py_**, run this
     ```sh
     $ gclient sync
     ```
@@ -55,7 +55,7 @@ Extra
     ```
   - Dart Observatory does not work on filefox. (I used **_Chromium_**)
     ```sh
-    apt-get install chromium-browser
+    $ apt-get install chromium-browser
     ```
   - Open up Chromium, and go to **_https://127.0.0.1:8181_**
   - Enable an access to host's LocalHost (Link current client's LocalHost to host's LocalHost). Run this on client side.
