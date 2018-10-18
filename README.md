@@ -4,14 +4,14 @@ Follow the steps below to apply these files in Dart VM.
 
 
 
-Step 1: Cloning Dart VM Repository
+Step 1: Cloning an Offical Dart SDK Repository
 ---
-- Clone [DartVM repository](https://github.com/dart-lang/sdk).
+- Clone [Official Dart SDK](https://github.com/dart-lang/sdk).
 - Follow the building steps [here](https://github.com/dart-lang/sdk/wiki/Building). 
 
 
 
-Step 2: Cloning our ImmixInDart 
+Step 2: Cloning our ImmixInDart Repo 
 ---
 - Go to runtime directory
 ```sh
