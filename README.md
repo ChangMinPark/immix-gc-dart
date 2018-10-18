@@ -18,9 +18,10 @@ Step 2: Cloning our ImmixInDart Repo
 $ cd (...)/sdk/runtime
 ```
 
-- Clone our repository
+- Clone and move to our repository
 ```sh
 $ git clone https://github.com/ChangMinPark/ImmixInDart.git
+$ cd ImmixInDart
 ```
 
 - Add our directory to PATH (Optional). You can add this line to shell config file. It will make your life easier to run **_buildDart.sh_** script anywhere.  
