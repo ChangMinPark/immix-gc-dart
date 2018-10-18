@@ -21,7 +21,7 @@ $ (...)/sdk/runtime
 $ git clone https://github.com/ChangMinPark/ImmixInDart.git
 ```
 
-- Add our building script to path (Optional). You can add this line to shell config file. 
+- Add our directory to PATH (Optional). You can add this line to shell config file. It will make your life easier to run **_buildDart.sh_** script anywhere.  
 ```sh
 $ export PATH="$PATH:$PWD"
 ```
