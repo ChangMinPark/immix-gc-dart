@@ -6,6 +6,7 @@
 
 #include "platform/assert.h"
 #include "platform/utils.h"
+#include "vm/compiler/jit/compiler.h"
 #include "vm/flags.h"
 #include "vm/heap/pages.h"
 #include "vm/heap/safepoint.h"
@@ -26,14 +27,6 @@
 #include "vm/thread_pool.h"
 #include "vm/timeline.h"
 #include "vm/virtual_memory.h"
-
-//  Modification by Chang
-//
-#include <exception>
-//   #include <linux/init.h>
-//   #include <linux/module.h>
-//   #include <linux/kernel.h>
- 
 
 namespace dart {
 
@@ -69,7 +62,6 @@ Heap::~Heap() {
 }
 
 uword Heap::AllocateNew(intptr_t size) {
-  //printf(" - Heap::AllocateNew, size: %zd\n", size);
   ASSERT(Thread::Current()->no_safepoint_scope_depth() == 0);
   // Currently, only the Dart thread may allocate in new space.
   isolate()->AssertCurrentThreadIsMutator();
@@ -82,16 +74,13 @@ uword Heap::AllocateNew(intptr_t size) {
     CollectGarbage(kNew);
     addr = new_space_.TryAllocateInTLAB(thread, size);
     if (addr == 0) {
-//      printf("Heap: addr==0, allocate on new gen - %zd bytes. addr = %lu\n", size, addr);
       return AllocateOld(size, HeapPage::kData);
     }
   }
-//  printf("Heap: allocate on new gen - %zd bytes. addr = %lu\n", size, addr);
   return addr;
 }
 
 uword Heap::AllocateOld(intptr_t size, HeapPage::PageType type) {
-  //printf(" - Heap::AllocateOld, size: %zd\n", size);
   ASSERT(Thread::Current()->no_safepoint_scope_depth() == 0);
   uword addr = old_space_.TryAllocate(size, type);
   if (addr != 0) {
@@ -131,7 +120,6 @@ uword Heap::AllocateOld(intptr_t size, HeapPage::PageType type) {
   }
   addr = old_space_.TryAllocate(size, type, PageSpace::kForceGrowth);
   if (addr != 0) {
-//    printf("Heap: allocation on old gen - %zd bytes. addr = %lu\n", size, addr);
     return addr;
   }
   // Give up allocating this object.
@@ -422,7 +410,6 @@ void Heap::CollectNewSpaceGarbage(Thread* thread, GCReason reason) {
   if (BeginNewSpaceGC(thread)) {
     RecordBeforeGC(kScavenge, reason);
     {
-      printf(" *** Collect New Space Garbage ***\n");
       VMTagScope tagScope(thread, VMTag::kGCNewSpaceTagId);
       TIMELINE_FUNCTION_GC_DURATION_BASIC(thread, "CollectNewGeneration");
       new_space_.Scavenge();
@@ -444,7 +431,6 @@ void Heap::CollectNewSpaceGarbage(Thread* thread, GCReason reason) {
 void Heap::CollectOldSpaceGarbage(Thread* thread,
                                   GCType type,
                                   GCReason reason) {
-  printf(" *** Collect Old Space Garbage ***\n");
   ASSERT(reason != kNewSpace);
   ASSERT(type != kScavenge);
   if (FLAG_use_compactor) {
@@ -589,10 +575,7 @@ void Heap::Init(Isolate* isolate,
                 intptr_t max_new_gen_words,
                 intptr_t max_old_gen_words) {
   ASSERT(isolate->heap() == NULL);
-  printf(" ---- heap.cc: Init(...), max_new_gen_words: %zd, max_old_gen_words: %zd\n",
-          max_new_gen_words, max_old_gen_words);
   Heap* heap = new Heap(isolate, max_new_gen_words, max_old_gen_words);
-  heap->PrintSizes();
   isolate->set_heap(heap);
 }
 
@@ -673,13 +656,6 @@ bool Heap::VerifyGC(MarkExpectation mark_expectation) const {
 }
 
 void Heap::PrintSizes() const {
-  printf(
-      "New space (%" Pd64 "k of %" Pd64
-      "k) "
-      "Old space (%" Pd64 "k of %" Pd64 "k)\n",
-      (UsedInWords(kNew) / KBInWords), (CapacityInWords(kNew) / KBInWords),
-      (UsedInWords(kOld) / KBInWords), (CapacityInWords(kOld) / KBInWords));
-
   OS::PrintErr(
       "New space (%" Pd64 "k of %" Pd64
       "k) "
@@ -861,8 +837,8 @@ void Heap::RecordAfterGC(GCType type) {
          (type == kMarkCompact && gc_old_space_in_progress_));
 #ifndef PRODUCT
   if (FLAG_support_service && Service::gc_stream.enabled() &&
-      !ServiceIsolate::IsServiceIsolateDescendant(Isolate::Current())) {
-    ServiceEvent event(Isolate::Current(), ServiceEvent::kGC);
+      !Isolate::IsVMInternalIsolate(isolate())) {
+    ServiceEvent event(isolate(), ServiceEvent::kGC);
     event.set_gc_stats(&stats_);
     Service::HandleEvent(&event);
   }
@@ -999,6 +975,24 @@ WritableVMIsolateScope::~WritableVMIsolateScope() {
   if (FLAG_write_protect_vm_isolate) {
     Dart::vm_isolate()->heap()->WriteProtect(true);
   }
+}
+
+BumpAllocateScope::BumpAllocateScope(Thread* thread)
+    : StackResource(thread), no_reload_scope_(thread->isolate(), thread) {
+  ASSERT(!thread->bump_allocate());
+  // If the background compiler thread is not disabled, there will be a cycle
+  // between the symbol table lock and the old space data lock.
+  BackgroundCompiler::Disable(thread->isolate());
+  thread->heap()->WaitForMarkerTasks(thread);
+  thread->heap()->old_space()->AcquireDataLock();
+  thread->set_bump_allocate(true);
+}
+
+BumpAllocateScope::~BumpAllocateScope() {
+  ASSERT(thread()->bump_allocate());
+  thread()->set_bump_allocate(false);
+  thread()->heap()->old_space()->ReleaseDataLock();
+  BackgroundCompiler::Enable(thread()->isolate());
 }
 
 }  // namespace dart
