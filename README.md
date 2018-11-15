@@ -6,7 +6,6 @@ Follow the steps below to apply these files in Dart VM.
 
 Step 1: Cloning an Offical Dart SDK Repository
 ---
-- Clone [Official Dart SDK](https://github.com/dart-lang/sdk).
 - Follow the building steps [here](https://github.com/dart-lang/sdk/wiki/Building). 
   - Possible errors
     - **_Ninja Error: loading 'build.ninja': No such file or directory_** -
