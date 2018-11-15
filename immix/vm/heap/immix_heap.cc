@@ -10,6 +10,7 @@ namespace dart{
 ImmixHeap::ImmixHeap(Isolate* isolate)
     : isolate_(isolate) {
   printf("ImmixHeap::ImmixHeap(...)\n");
+  space_ = malloc(BLOCK_SIZE * 1000);
         // TODO: UpdateGlobalMaxUsed();
         // TODO: Initialize heap. 
 }

@@ -19,8 +19,8 @@ class ImmixHeap {
 
     Isolate* isolate_;
 
-    //Block* blocks_;
-
+    /* Types does not matter here since it is just for requesting a space. */
+    char* space_;
 
 };
 }
