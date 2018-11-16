@@ -5,6 +5,8 @@
 #include "vm/globals.h"
 #include "vm/heap/block.h"
 
+#define BLOCK_NUM 1000
+
 namespace dart {
 class ImmixHeap {
     public:
@@ -21,6 +23,9 @@ class ImmixHeap {
 
     /* Types does not matter here since it is just for requesting a space. */
     char* space_;
+
+    intptr_t start_;
+    intptr_t end_;
 
 };
 }
