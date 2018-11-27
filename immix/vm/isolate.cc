@@ -1087,6 +1087,9 @@ Isolate* Isolate::InitIsolate(const char* name_prefix,
   char BUILD_DART2JS[] = "dart2js";
   */
 
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  
+  
   std::string DEFAULT_ISOLATE[] = {"vm-isolate", "vm-service", "kernel-service", "isolate",
                                 "dart2js", "kernel_service", "analyzer.dart", "dartdevk.dart",
                                 "format.dart", "dartdoc.dart", "create_snapshot_entry.dart",
@@ -1103,7 +1106,7 @@ Isolate* Isolate::InitIsolate(const char* name_prefix,
   }
 
   if(res){
-    printf("[Isolate.cc] Heap. name_prefix: %s\n", name_prefix);
+    // printf("[Isolate.cc] Heap. name_prefix: %s\n", name_prefix);
     Heap::Init(result,
                is_vm_isolate
                    ? 0  // New gen size 0; VM isolate should only allocate in old.
@@ -1115,7 +1118,15 @@ Isolate* Isolate::InitIsolate(const char* name_prefix,
     /* Use ImmixHeap Only for Main Isolate. */
     printf("[Isolate.cc] ImmixHeap. name_prefix: %s\n", name_prefix);
     ImmixHeap::Init(result, FLAG_old_gen_heap_size);
+    //printf("result->immixHeap(): %p\n",result->immixHeap());
+    printf(" - ImmixHeap::start_: %lu\n", result->immixHeap()->start_);
+    printf(" - ImmixHeap::end_: %lu\n", result->immixHeap()->end_);
+    result->immixHeap()->printBlocksAndLines();
+    exit(0);
   }
+
+
+  //////////////////////////////////////////////////////////////////////////////////////////////
 
 
   // TODO(5411455): For now just set the recently created isolate as

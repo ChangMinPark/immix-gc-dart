@@ -33,9 +33,11 @@ heap_sources = [
   "weak_table.cc",
   "weak_table.h",
 
-  "immix_heap.cc",
+###  Added for ImmixHeap Implementation  ###
   "immix_heap.h",
+  "immix_heap.cc",
   "block.h",
+  "block.cc",
   "line.h"
 ]
 

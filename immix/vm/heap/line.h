@@ -3,6 +3,10 @@
 
 #define LINE_SIZE 256   // in bytes.
 
+#define LINE_MARK_UNUSED 0
+#define LINE_MARK_USED 1
+#define LINE_MARK_IMPLICIT 2
+
 namespace dart{
 
 class Line{

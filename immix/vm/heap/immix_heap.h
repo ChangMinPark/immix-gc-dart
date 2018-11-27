@@ -5,7 +5,7 @@
 #include "vm/globals.h"
 #include "vm/heap/block.h"
 
-#define BLOCK_NUM 1000
+#define BLOCK_NUM 10
 
 namespace dart {
 class ImmixHeap {
@@ -14,11 +14,13 @@ class ImmixHeap {
     ~ImmixHeap();
 
     static void Init(Isolate* isolate, intptr_t max_words);
-    uword Allocate(intptr_t size);
-            
+    
+    intptr_t getFirstFreeBlock();
+    intptr_t getNextRecyclableBlock(intptr_t current_block);
+
+    bool isAllocatableSize(intptr_t size);
 
     Isolate* isolate() const { return isolate_; };
-
     Isolate* isolate_;
 
     /* Types does not matter here since it is just for requesting a space. */
@@ -26,6 +28,13 @@ class ImmixHeap {
 
     intptr_t start_;
     intptr_t end_;
+
+    static void initializeBlocks(intptr_t start);
+    uword Allocate(intptr_t size);
+
+    /* For Testing */
+    void printBlocksAndLines();
+
 
 };
 }
