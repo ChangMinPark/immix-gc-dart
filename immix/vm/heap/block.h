@@ -4,7 +4,8 @@
 #include "vm/heap/line.h"
 #include <stdint.h>
 
-#define NUM_LINE_IN_BLOCK 11                   // First line is for meta data.
+#define NUM_LINE_IN_BLOCK 11                    // First line is for meta data.
+                                                // Default: 128
 #define BLOCK_SIZE NUM_LINE_IN_BLOCK*LINE_SIZE   // in bytes.
 #define MAX_OBJECT_SIZE BLOCK_SIZE/2 
 #define BLOCK_STATE_OFFSET NUM_LINE_IN_BLOCK-1

@@ -1117,10 +1117,10 @@ Isolate* Isolate::InitIsolate(const char* name_prefix,
   } else {
     /* Use ImmixHeap Only for Main Isolate. */
     printf("[Isolate.cc] ImmixHeap. name_prefix: %s\n", name_prefix);
-    ImmixHeap::Init(result, FLAG_old_gen_heap_size);
+    ImmixHeap* immixHeap = new ImmixHeap(result);
+    result->set_immixHeap(immixHeap);
+    //ImmixHeap::Init(result, FLAG_old_gen_heap_size);
     //printf("result->immixHeap(): %p\n",result->immixHeap());
-    printf(" - ImmixHeap::start_: %lu\n", result->immixHeap()->start_);
-    printf(" - ImmixHeap::end_: %lu\n", result->immixHeap()->end_);
     result->immixHeap()->printBlocksAndLines();
     exit(0);
   }

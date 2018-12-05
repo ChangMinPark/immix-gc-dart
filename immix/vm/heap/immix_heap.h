@@ -13,7 +13,7 @@ class ImmixHeap {
     ImmixHeap(Isolate* isolate);
     ~ImmixHeap();
 
-    static void Init(Isolate* isolate, intptr_t max_words);
+    void init(Isolate* isolate);
     
     intptr_t getFirstFreeBlock();
     intptr_t getNextRecyclableBlock(intptr_t current_block);
@@ -23,18 +23,15 @@ class ImmixHeap {
     Isolate* isolate() const { return isolate_; };
     Isolate* isolate_;
 
-    /* Types does not matter here since it is just for requesting a space. */
-    char* space_;
+    intptr_t* blockAddresses_;
+    int blockNum_;
 
-    intptr_t start_;
-    intptr_t end_;
-
-    static void initializeBlocks(intptr_t start);
-    uword Allocate(intptr_t size);
+    void initializeBlocks();
+    
+    uword allocate(intptr_t size);
 
     /* For Testing */
     void printBlocksAndLines();
-
 
 };
 }
