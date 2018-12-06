@@ -1115,12 +1115,36 @@ Isolate* Isolate::InitIsolate(const char* name_prefix,
                                              : FLAG_old_gen_heap_size) *
                    MBInWords);
   } else {
-    /* Use ImmixHeap Only for Main Isolate. */
-    printf("[Isolate.cc] ImmixHeap. name_prefix: %s\n", name_prefix);
+    /* Use ImmixHeap only for main isolate */
+    printf("[Isolate.cc] Running ImmixHeap for: %s\n", name_prefix);
     ImmixHeap* immixHeap = new ImmixHeap(result);
     result->set_immixHeap(immixHeap);
-    //ImmixHeap::Init(result, FLAG_old_gen_heap_size);
-    //printf("result->immixHeap(): %p\n",result->immixHeap());
+    
+    /* Test for 10 smalll allocations */
+    printf(" --> %ld\n", immixHeap->allocate(60));
+    printf(" --> %ld\n", immixHeap->allocate(237));
+    printf(" --> %ld\n", immixHeap->allocate(123));
+    printf(" --> %ld\n", immixHeap->allocate(43));
+    printf(" --> %ld\n", immixHeap->allocate(62));
+    printf(" --> %ld\n", immixHeap->allocate(190));
+    printf(" --> %ld\n", immixHeap->allocate(23));
+    printf(" --> %ld\n", immixHeap->allocate(203));
+    printf(" --> %ld\n", immixHeap->allocate(87));
+    printf(" --> %ld\n", immixHeap->allocate(193));
+    result->immixHeap()->printBlocksAndLines();
+
+    /* Test for big allocations */
+    printf(" --> %ld\n", immixHeap->allocate(970));
+    printf(" --> %ld\n", immixHeap->allocate(800));
+    printf(" --> %ld\n", immixHeap->allocate(2500));
+    printf(" --> %ld\n", immixHeap->allocate(1000));
+    printf(" --> %ld\n", immixHeap->allocate(200));
+    result->immixHeap()->printBlocksAndLines();
+
+    /* Test for requesting new block */
+    printf(" --> %ld\n", immixHeap->allocate(500));
+    printf(" --> %ld\n", immixHeap->allocate(500));
+    printf(" --> %ld\n", immixHeap->allocate(1000));
     result->immixHeap()->printBlocksAndLines();
     exit(0);
   }

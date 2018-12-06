@@ -38,7 +38,8 @@ heap_sources = [
   "immix_heap.cc",
   "block.h",
   "block.cc",
-  "line.h"
+  "line.h",
+  "line.cc"
 ]
 
 heap_sources_tests = [

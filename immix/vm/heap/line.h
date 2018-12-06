@@ -13,11 +13,10 @@ namespace dart{
 
 class Line{
     public:
-    static intptr_t calculateLinesNeeded(intptr_t size) {
-        intptr_t result = size / LINE_SIZE;
-        if (size % LINE_SIZE != 0) result++;
-        return result;
-    }
+    /* Helper methods  */    
+    static intptr_t calculateLinesNeeded(intptr_t size);
+    static void markLine(intptr_t lineTableIndex, uint8_t markState);
+    static uint8_t getLineMark(intptr_t lineTableIndex);
 };
 }
 #endif // RUNTIME_VM_HEAP_LINE_H_

@@ -5,7 +5,7 @@
 #include "vm/globals.h"
 #include "vm/heap/block.h"
 
-#define BLOCK_NUM 10
+#define BLOCK_NUM 3
 
 namespace dart {
 class ImmixHeap {
@@ -15,8 +15,7 @@ class ImmixHeap {
 
     void init(Isolate* isolate);
     
-    intptr_t getFirstFreeBlock();
-    intptr_t getNextRecyclableBlock(intptr_t current_block);
+    intptr_t getFreeBlock();
 
     bool isAllocatableSize(intptr_t size);
 

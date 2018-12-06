@@ -26,32 +26,95 @@ uword ImmixHeap::allocate(intptr_t size) {
     ASSERT(Thread::Current()->no_safepoint_scope_depth() == 0);
 
     /* Whether it's allocatable or not */
-    ASSERT(isAllocatableSize(size));
-    if(size < LINE_SIZE) {      // Can fit into a single line
-        // TODO: Look for recyclable lines.
+    if(!isAllocatableSize(size)) {
+        printf(" - Cannot allocate an object (%ld bytes)\n", size);
+        return 0;
+    }
 
-    } else {                    // Requires multiple lines
-        // intptr_t lines_needed = Line::calculateLinesNeeded(size);
-        
-        // TODO: Calculate how many contiguous lines.
-        //
+    if(size < LINE_SIZE) {      // Can fit into a single line
+        printf(" - Allocate an object (%ld bytes): 1 Line\n", size);
+
+        /* Look for implicitly marked line */
+        for(int i = 0; i < blockNum_; i++) {
+            intptr_t block = blockAddresses_[i];
+            intptr_t line = Block::findFirstRecyclableLine(block);
+            if (line != 0) {             
+                Line::markLine(Block::getIndexFromLine(block, line), LINE_MARK_USED);
+                Block::updateBlockState(block);
+                return line;
+            }
+        }
+
+        /* Look for available line */
+        for(int i = 0; i < blockNum_; i++) {
+            intptr_t block = blockAddresses_[i];
+            intptr_t line = Block::findFirstAvailableLine(block);
+            if (line != 0) {
+                // TODO: Currently it marks UNUSED, should be IMPLICIT in future.
+                Line::markLine(Block::getIndexFromLine(block, line), LINE_MARK_USED);
+                Block::updateBlockState(block);
+                return line;
+            }
+        }
+
+        /* Get new free block */
+        intptr_t block = getFreeBlock();
+        intptr_t line = Block::findFirstAvailableLine(block);
+        // TODO: Currently it marks UNUSED, should be IMPLICIT in future.
+        Line::markLine(Block::getIndexFromLine(block, line), LINE_MARK_USED);
+        Block::updateBlockState(block);
+        return line;
+
+    } else {    // Requires multiple lines
+        intptr_t linesNeeded = Line::calculateLinesNeeded(size);
+        printf(" - Allocate an object (%ld bytes): %ld lines\n", size, linesNeeded);
+       
+        /* Look for availabe contiguous lines in existing blocks */
+        for(int i = 0; i < blockNum_; i++) {
+            intptr_t block = blockAddresses_[i];
+            intptr_t firstLine = Block::findContiguousAvailableLines(block, linesNeeded);
+            if(firstLine != 0) {
+                intptr_t lineIndex = Block::getIndexFromLine(block, firstLine);
+                for(intptr_t j = 0; j < linesNeeded; j++) {
+                    Line::markLine(lineIndex + j, LINE_MARK_USED);
+                }
+                Block::updateBlockState(block);
+                return firstLine;
+            } 
+        }
+
+        /* Get new free block */
+        intptr_t block = getFreeBlock();
+        intptr_t firstLine = Block::findContiguousAvailableLines(block, linesNeeded);
+        intptr_t lineIndex = Block::getIndexFromLine(block, firstLine);
+        for(intptr_t j = 0; j < linesNeeded; j++) {
+            Line::markLine(lineIndex + j, LINE_MARK_USED);
+        }
+        Block::updateBlockState(block);
+        return firstLine;            
 
     }
-    //TODO: If size is less than a line size, use IMPLICIT MARKING 
     
-    //isolate()->AssertCurrentThreadIsMutator();
-    //Thread* thread = Thread::Current();
     return 0;
 }
 
-intptr_t ImmixHeap::getFirstFreeBlock(){
-    return 0;
+intptr_t ImmixHeap::getFreeBlock(){
+    printf(" --> ImmixHeap::getFreeBlock() \n");
+    char* block = (char*) malloc(BLOCK_SIZE);
+    Block::init((intptr_t) block);
 
-}
+    blockNum_++;
+    intptr_t* new_blockAddresses_ = (intptr_t*) malloc(sizeof(intptr_t) * blockNum_);
+    for(int i = 0; 0 < blockNum_; i++) {
+        if (i == blockNum_ - 1) {
+            new_blockAddresses_[i] = (intptr_t) block; 
+            break;
+        }
+        new_blockAddresses_[i] = blockAddresses_[i];       
+    }
+    blockAddresses_ = new_blockAddresses_;
 
-intptr_t ImmixHeap::getNextRecyclableBlock(intptr_t current_block){
-    return 0;
-
+    return (intptr_t) block;
 }
 
 bool ImmixHeap::isAllocatableSize(intptr_t size_) {
@@ -59,6 +122,7 @@ bool ImmixHeap::isAllocatableSize(intptr_t size_) {
 }
 
 void ImmixHeap::initializeBlocks() {
+    printf(" - Initialized %d blocks.\n",BLOCK_NUM);
     blockAddresses_ = (intptr_t*) malloc(sizeof(intptr_t) * BLOCK_NUM);
     blockNum_ = BLOCK_NUM;
     for(int i = 0; i < BLOCK_NUM; i++) {
@@ -73,12 +137,13 @@ void ImmixHeap::initializeBlocks() {
 /* These methods are for debugging. Recommend to use with small number of blocks and lines */
 void ImmixHeap::printBlocksAndLines() {
     // printf("blockNum_: %d\n", blockNum_);
+    printf("\n----- Printing Blocks & Lines -----\n");
     for(int i = 0; i < (int) blockNum_; i++) {
         
         // printf(" - printing %dth block...\n", i);
         intptr_t block = (intptr_t) blockAddresses_[i];
-        uint8_t* state = (uint8_t*) Block::getBlockState(block);
-        switch (*state) {
+        uint8_t state = Block::getBlockState(block);
+        switch (state) {
             case BLOCK_STATE_FREE:
                 printf("[.]");
                 break;
@@ -106,6 +171,7 @@ void ImmixHeap::printBlocksAndLines() {
         }
         printf("\n");
     }
+    printf("\n");
 
 }
 }   // Close namespace

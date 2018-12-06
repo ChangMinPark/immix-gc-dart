@@ -22,12 +22,21 @@ namespace dart{
 class Block {
 
     public:
+    /* Initializing methods */
     static void init(intptr_t block);
     static void initLineTable(intptr_t lineTable);
 
     /* Beginning of a block is a line table. */
     static intptr_t getLineTable(intptr_t block) { return block; };
-    static intptr_t getBlockState(intptr_t block) { return block+BLOCK_STATE_OFFSET; };
+    static uint8_t getBlockState(intptr_t block); 
+    static void updateBlockState(intptr_t block);
+
+    /* Helper methods */
+    static intptr_t getLineFromIndex(intptr_t block, intptr_t lineIndex);
+    static intptr_t getIndexFromLine(intptr_t block, intptr_t line);
+    static intptr_t findFirstAvailableLine(intptr_t block);
+    static intptr_t findFirstRecyclableLine(intptr_t block);
+    static intptr_t findContiguousAvailableLines(intptr_t block, intptr_t numLines);
 
 }; 
 }
