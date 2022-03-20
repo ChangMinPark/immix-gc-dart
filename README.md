@@ -1,4 +1,4 @@
-# ImmixInDart
+# Immix Garbage Collection in Dart
 This repository contains all the files to be replaced to implement Immix GC in Dart. 
 Follow the steps below to apply these files in Dart VM. 
 
