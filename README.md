@@ -1,7 +1,7 @@
 # Immix Garbage Collection in Dart
 This repository contains all the files we have implemented for a course project to enable Immix garbage collection in Dart VM.
 
-_Please refer to [this website](https://changminpark.github.io/immix) for deetails about our project._
+_Please refer to [this website](https://changminpark.github.io/immix) for details about our project._
 
 
 <br/>
